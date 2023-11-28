@@ -1,16 +1,25 @@
 ﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MongoDB.Example.Models.Ads
 {
     public class AdModel
     {
+
+        [NotMapped]
+        [BsonIgnore]
+        public const string CollectionName = "AdsCollection";
         public AdModel()
         {
             CurrentAdState = AdState.Created;
             ModifiedDate= DateTime.Now;
             ChangeLog.Add("Ad Created");
+            AdId = AdId == ObjectId.Empty ? ObjectId.GenerateNewId() : AdId;
         }
+
+        public ObjectId AdId { get; set; }
         public string Name { get;private set; }
         public string Description { get;private set; }
         public DateTime PublishDate { get;private set; }
@@ -41,7 +50,7 @@ namespace MongoDB.Example.Models.Ads
 
 
         }
-        public void SetAdCategories(List<AdCategories> categories)
+        public void SetAdCategories(List<AdCategory> categories)
         {
             Categories.AddRange(categories.Select(a => a.Id));
             ModifiedDate = DateTime.Now;
