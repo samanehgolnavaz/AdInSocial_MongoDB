@@ -5,11 +5,11 @@ using MongoDB.Example.Models.Ads;
 
 namespace MongoDB.Example.EndPoints
 {
-    public class CreateAdPublisherEndpoint : ICarterModule
+    public class CreateAdPublisher : ICarterModule
     {
         private readonly IMongoDatabase _mongoDatabase;
-        public record CreateAdPublisherModel(string PublishName,Guid PublisherId);
-        public CreateAdPublisherEndpoint(IMongoDatabase mongoDatabase)
+        public record CreateAdPublisherModel(string PublishName);
+        public CreateAdPublisher(IMongoDatabase mongoDatabase)
         {
             _mongoDatabase = mongoDatabase;
         }
@@ -17,10 +17,10 @@ namespace MongoDB.Example.EndPoints
         {
             app.MapPost("/CreatePublisher", async (CreateAdPublisherModel model) =>
             {
-                var collection = _mongoDatabase.GetCollection<AdPublisher>("AdPublisherCollection");
+                var collection = _mongoDatabase.GetCollection<AdPublisher>(AdPublisher.CollectionName);
                 var adPublisher = new AdPublisher()
                 {
-                    PublisherName=model.PublishName,Id=ObjectId.Parse(model.PublisherId.ToString())
+                    PublisherName = model.PublishName, Id = ObjectId.GenerateNewId()
                 };
                 await collection.InsertOneAsync(adPublisher);
                 return Results.Created($"/GetAdPublisher/{adPublisher.Id.ToString()}",adPublisher);
